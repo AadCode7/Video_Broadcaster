@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Broadcast</title>
+    <link rel="stylesheet" href="./static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <img src="./static/croc.jpg" alt="Logo" height = "300px", width = "300px">
+                <h1>Virtual Camera Controller</h1>
+            </div>
+            <div id="status">
+                <span class="status-indicator"></span>
+                <span class="status-text">Waiting for action...</span>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="preview-container">
+                <div class="video-preview">
+                    <div class="no-stream">
+                        <i class="fas fa-video-slash"></i>
+                        <p>No active stream</p>
+                    </div>
+                    <!-- Video element will be added here via JavaScript -->
+                </div>
+            </div>
+
+            <div class="controls-container">
+                <div class="control-section">
+                    <h2>Camera Settings</h2>
+                    <div class="control-group">
+                        <label for="camera">Camera Source</label>
+                        <div class="select-wrapper">
+                            <select id="camera">
+                                <option value="">Select a camera...</option>
+                            </select>
+                            <button class="icon-button" onclick="devices()" title="Refresh camera list">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="fps">Frame Rate</label>
+                        <div class="range-with-value">
+                            <input id="fps" type="range" min="1" max="60" value="15">
+                            <span class="range-value" id="fps-value">15 FPS</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="blur">Blur Strength</label>
+                        <div class="range-with-value">
+                            <input id="blur" type="range" min="1" max="53" value="11">
+                            <span class="range-value" id="blur-value">11</span>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="background">Background Mode</label>
+                        <div class="select-wrapper">
+                            <select id="background">
+                                <option value="default">Default</option>
+                                <option value="none">Remove Background</option>
+                                <option value="blur">Blur Background</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="primary-button start-button" onclick="startStream()">
+                        <i class="fas fa-play"></i> Start Streaming
+                    </button>
+                    <button class="secondary-button stop-button" onclick="stopStream()" disabled>
+                        <i class="fas fa-stop"></i> Stop Streaming
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update range value displays
+        document.getElementById('fps').addEventListener('input', function() {
+            document.getElementById('fps-value').textContent = this.value + ' FPS';
+        });
+
+        document.getElementById('blur').addEventListener('input', function() {
+            document.getElementById('blur-value').textContent = this.value;
+        });
+
+        // Function to list available camera devices
+        function devices() {
+            const statusText = document.querySelector('.status-text');
+            statusText.textContent = "Fetching camera devices...";
+            
+            fetch('/devices')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('camera');
+                    select.innerHTML = '<option value="">Select a camera...</option>';
+                    data.forEach(device => {
+                        select.innerHTML += `<option value="${device.id}">${device.name}</option>`;
+                    });
+                    statusText.textContent = "Camera devices loaded";
+                })
+                .catch(error => {
+                    statusText.textContent = "Error: Failed to fetch camera devices";
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to start streaming
+        function startStream() {
+            const source = document.getElementById('camera').value;
+            
+            if (!source) {
+                alert("Please select a camera first!");
+                return;
+            }
+            
+            const fps = document.getElementById('fps').value;
+            const blur = document.getElementById('blur').value;
+            const background = document.getElementById('background').value;
+            
+            const statusText = document.querySelector('.status-text');
+            statusText.textContent = "Starting stream...";
+            
+            // Update the URL to use proper template literals
+            fetch(`/start?source=${source}&fps=${fps}&blur=${blur}&background=${background}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusText.textContent = "Stream active";
+                    document.querySelector('.status-indicator').classList.add('active');
+                    
+                    // Enable stop button and disable start button
+                    document.querySelector('.start-button').disabled = true;
+                    document.querySelector('.stop-button').disabled = false;
+                    
+                    // Create video element if it doesn't exist
+                    let videoElement = document.querySelector('.video-preview video');
+                    if (!videoElement) {
+                        videoElement = document.createElement('video');
+                        videoElement.autoplay = true;
+                        videoElement.playsInline = true;
+                        document.querySelector('.video-preview').appendChild(videoElement);
+                    }
+                    
+                    // Hide the no-stream message
+                    document.querySelector('.no-stream').style.display = 'none';
+                    
+                    // Set the video source (this would depend on your backend implementation)
+                    // videoElement.srcObject = ... (Set this based on your backend)
+                })
+                .catch(error => {
+                    statusText.textContent = "Error: Failed to start stream";
+                    console.error('Error:', error);
+                });
+        }
+
+        // Function to stop streaming
+        function stopStream() {
+            const statusText = document.querySelector('.status-text');
+            statusText.textContent = "Stopping stream...";
+            
+            fetch('/stop')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    statusText.textContent = "Stream stopped";
+                    document.querySelector('.status-indicator').classList.remove('active');
+                    
+                    // Enable start button and disable stop button
+                    document.querySelector('.start-button').disabled = false;
+                    document.querySelector('.stop-button').disabled = true;
+                    
+                    // Show the no-stream message
+                    document.querySelector('.no-stream').style.display = 'flex';
+                    
+                    // Remove video element
+                    const videoElement = document.querySelector('.video-preview video');
+                    if (videoElement) {
+                        videoElement.remove();
+                    }
+                })
+                .catch(error => {
+                    statusText.textContent = "Error: Failed to stop stream";
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

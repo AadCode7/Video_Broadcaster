@@ -1,0 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins');
+
+body {
+    margin: 0;
+    padding: 0;
+    height:100vh;
+    font-family: 'Poppins', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: url('./background.jpg') no-repeat center center fixed;
+    background-size: cover;
+    background-position: center;
+}
+
+h1 {
+    color: #444;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    background: #007bff;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+button:hover { background: #0056b3;}
+
+.container{
+    width: 70%;
+    max-width: 750px;
+    padding: 20px;
+    border-radius: 20px;
+    background: #fff;
+    text-align: center;
+    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2), 
+        0 6px 6px rgba(0, 0, 0, 0.15);
+    border: 2px solid #e0e0e0;
+    background: linear-gradient(145deg, #ffffff, #e6e6e6)
+}
+
+.button, .inputs{
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.controls{
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+select, input[type=range], input[type=number] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+#status {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background: #e9ecef;
+    border-radius: 5px;
+}

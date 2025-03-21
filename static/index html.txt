@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Video Broadcast</title>
+        <link rel="stylesheet" href="./static/style.css">
+    </head>
+    <body>
+        <img src="./static/croc.jpg" height="100", width="100">
+
+        <div class="container">
+            <h1>Virtual Camera Controller</h1>
+            <div class="controls">
+                <div class="button">
+                    <button onclick="devices()">List Devices</button>
+                    <button onclick="startStream()">Start Streaming</button>
+                    <button onclick="stopStream()">Stop Streaming</button>
+                </div>
+    
+                <div class="inputs">
+                    <label for="camera">Choose Camera</label>
+                    <select id="camera"></select>
+    
+                    <label for="fps">FPS</label>
+                    <input id="fps" type="number" min="1" max="60" value="15">
+    
+                    <label for="blur">Blur Strength</label>
+                    <input id="blur" type="range" min="1" max="53" value="11">
+                
+                    <label for="background">Background</label>
+                    <select id="background">
+                        <option value="default">Default</option>
+                        <option value="none">Remove Background</option>
+                        <option value="blur">Blur it!</option>                    
+                    </select> 
+    
+                </div>
+            </div>
+            <div id="status">Status: Waiting for action...</div>
+        </div>
+
+        <script>
+            function devices(){
+                fetch('/devices')
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('camera');
+                    select.innerHTML = '';
+                    data.forEach(device => {
+                        select.innerHTML += `<option value="${device.id}">${device.name}</option>`;
+                    });
+                });
+            }
+
+            function startStream(){
+                const source = document.getElementById('camera').value;
+                const fps = document.getElementById('fps').value;
+                const blur = document.getElementById('blur').value;
+                const background = document.getElementById('background').value;
+                
+                fetch('/start?source = ${source}&fps = ${fps}&blur = ${background}& = ${background}')
+            }
+        </script>
+    </body>
+</html>
