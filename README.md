@@ -2,7 +2,7 @@
 
 This project is a real-time video streaming and segmentation application built with FastAPI, OpenCV, and Ultralytics YOLOv8. The application supports background blurring, masking, and custom background replacement using semantic segmentation powered by YOLO.
 
-Features
+## Features
 
 Web-based UI hosted via FastAPI
 
@@ -18,7 +18,7 @@ Start/Stop streaming via REST API
 
 Enumerate available video devices
 
-Technologies Used
+## Technologies Used
 
 Python (3.8+)
 
@@ -34,18 +34,7 @@ Torch (PyTorch): deep learning framework
 
 Threading: to run video streaming without blocking the API
 
-File Structure
-
-project_root/
-├── main.py                # FastAPI app entry point
-├── Engine.py              # Video processing and segmentation logic
-├── stream_utils.py        # Stream control and threading logic (not included in snippet)
-├── static/
-│   └── index.html         # UI frontend
-│   └── office.jpg         # Background image
-└── README.txt             # This file
-
-API Endpoints
+## API Endpoints
 
 GET / — serves index.html
 
